@@ -86,7 +86,7 @@ WSGI_APPLICATION = 'xmlparser.wsgi.application'
 
 DATABASES = {
                'default': {
-                    'ENGINE': 'xmlparse.mysql.pythonanywhere-services.com',
+                    'ENGINE': 'django.db.backends.mysql',
                     'NAME': 'xmlparse$xmlparser',
                     'USER': 'xmlparse',
                     'PASSWORD': 'test1234',
