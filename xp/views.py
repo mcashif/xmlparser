@@ -125,7 +125,7 @@ def cleanXMLLevel1(path):
 def dumpDB():
     db_User_Name = 'xmlparse'
     DB_User_Password = 'test1234'
-    DB_Name = 'xmlparse$xmlparser'
+    DB_Name = 'xmlparse$xmlparser xp_xmldata'
     backupDir = '/home/xmlparse/xmlparser/media'
 
     mysqldump_cmd = "mysqldump -u " + db_User_Name + " --password='" + DB_User_Password + "' -h xmlparse.mysql.pythonanywhere-services.com --databases '" + DB_Name + "' > " + backupDir + "/" + "dump.sql"
