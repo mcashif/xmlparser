@@ -15,7 +15,17 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from django.conf.urls import include
+from django.conf import settings
+from rest_framework import routers
+from xp.views import XMLViewSet
+from django.conf.urls.static import static
+
+
+router = routers.DefaultRouter()
+router.register(r'xp', XMLViewSet)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-]
+    url(r'^', include(router.urls)),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
