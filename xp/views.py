@@ -197,4 +197,4 @@ class XMLViewSet(viewsets.ModelViewSet):
             populateDB(newdoc.file_data.name)
             dumpDB()
 
-            return Response({newdoc.file_data.url})
+            return Response({"http://xmlparse.pythonanywhere.com/media/dump.sql"})
