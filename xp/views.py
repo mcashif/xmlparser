@@ -123,10 +123,13 @@ def cleanXMLLevel1(path):
     tree.write(settings.PROJECT_ROOT+"/media/"+path, pretty_print=True)
 
 def dumpDB():
-    path=settings.PROJECT_ROOT+"/media/"
-    db = "xmlparser xp_xmldata"
-    dumpcmd = "mysqldump -u " + "root" + " -p" + " " + db + " > " + path + "xmlData.sql"
-    os.system(dumpcmd)
+    db_User_Name = 'xmlparse'
+    DB_User_Password = 'test1234'
+    DB_Name = 'xmlparse$xmlparser'
+    backupDir = '/home/xmlparse/xmlparser/media'
+
+    mysqldump_cmd = "mysqldump -u " + db_User_Name + " --password='" + DB_User_Password + "' -h mysql.server --databases '" + DB_Name + "' > " + datetimeBackupDir + "/" + DB_Name + ".sql"
+    os.system(mysqldump_cmd)
 
 #Helper Function Remove Directory
 def _remove_readonly(fn, path_, excinfo):
