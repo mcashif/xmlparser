@@ -86,10 +86,10 @@ WSGI_APPLICATION = 'xmlparser.wsgi.application'
 
 DATABASES = {
                'default': {
-                    'ENGINE': 'django.db.backends.mysql',
-                    'NAME': 'xmlparser',
-                    'USER': 'root',
-                    'PASSWORD': '',
+                    'ENGINE': 'xmlparse.mysql.pythonanywhere-services.com',
+                    'NAME': 'xmlparse$xmlparser',
+                    'USER': 'xmlparse',
+                    'PASSWORD': 'test1234',
                     'HOST': '', # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
                     'PORT': '', # Set to empty string for default.
        }
