@@ -7,6 +7,7 @@ from rest_framework.parsers import MultiPartParser,FileUploadParser,FormParser
 from rest_framework.response import Response
 from lxml import etree
 import os
+import stat
 
 # Create your views here.
 
@@ -78,6 +79,8 @@ def getRealNext(node):
            return el
 
     return False
+
+
 #clean XML file from self closing tags and put non-tail data under tags.
 def cleanXMLLevel2(path):
 
@@ -125,6 +128,49 @@ def dumpDB():
     dumpcmd = "mysqldump -u " + "root" + " -p" + " " + db + " > " + path + "xmlData.sql"
     os.system(dumpcmd)
 
+#Helper Function Remove Directory
+def _remove_readonly(fn, path_, excinfo):
+    # Handle read-only files and directories
+    if fn is os.rmdir:
+        os.chmod(path_, stat.S_IWRITE)
+        os.rmdir(path_)
+    elif fn is os.remove:
+        os.lchmod(path_, stat.S_IWRITE)
+        os.remove(path_)
+
+
+def force_remove_file_or_symlink(path_):
+    try:
+        os.remove(path_)
+    except OSError:
+        os.lchmod(path_, stat.S_IWRITE)
+        os.remove(path_)
+
+
+# Code from shutil.rmtree()
+def is_regular_dir(path_):
+    try:
+        mode = os.lstat(path_).st_mode
+    except os.error:
+        mode = 0
+    return stat.S_ISDIR(mode)
+
+
+def clear_dir(path_):
+    if is_regular_dir(path_):
+        # Given path is a directory, clear its content
+        for name in os.listdir(path_):
+            fullpath = os.path.join(path_, name)
+            if is_regular_dir(fullpath):
+                shutil.rmtree(fullpath, onerror=_remove_readonly)
+            else:
+                force_remove_file_or_symlink(fullpath)
+    else:
+        # Given path is a file or a symlink.
+        # Raise an exception here to avoid accidentally clearing the content
+        # of a symbolic linked directory.
+        raise OSError("Cannot call clear_dir() on a symbolic link")
+
 # ViewSets API call to load XML.
 # http -f -a mcashif:abc12345 --timeout=25000 PUT http://127.0.0.1:8000/test/ file_name=kashif docfile@/Users/Apple/Downloads/yy.xml
 class XMLViewSet(viewsets.ModelViewSet):
@@ -135,6 +181,7 @@ class XMLViewSet(viewsets.ModelViewSet):
         def put(self, request, format=None):
 
             #CLear All Old Data in Database
+            clear_dir(settings.PROJECT_ROOT+"/media/dbdata/")
             XMLFile.objects.all().delete()
             #////////////////////////////////////////////////////
             #Read Excel and load into Database for processing.....
