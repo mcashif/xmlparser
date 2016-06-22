@@ -90,7 +90,7 @@ DATABASES = {
                     'NAME': 'xmlparse$xmlparser',
                     'USER': 'xmlparse',
                     'PASSWORD': 'test1234',
-                    'HOST': '', # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+                    'HOST': 'xmlparse.mysql.pythonanywhere-services.com', # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
                     'PORT': '', # Set to empty string for default.
        }
 }
