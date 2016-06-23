@@ -6,6 +6,7 @@ from rest_framework import routers, serializers, viewsets
 from rest_framework.parsers import MultiPartParser,FileUploadParser,FormParser
 from rest_framework.response import Response
 from lxml import etree
+from django.http import Http404, HttpResponse
 import os
 import stat
 
@@ -196,4 +197,8 @@ class XMLViewSet(viewsets.ModelViewSet):
             populateDB(newdoc.file_data.name)
             dumpDB()
 
-            return Response({"http://xmlparse.pythonanywhere.com/media/dump.sql"})
+
+            dump_file = open('/home/xmlparse/xmlparser/media/dump.sql', 'r')
+            response = HttpResponse(dump_file, content_type='application/force-download')
+            response['Content-Disposition'] = 'attachment; filename="%s"' % 'dump.sql'
+            return response
