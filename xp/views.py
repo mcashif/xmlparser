@@ -9,6 +9,7 @@ from lxml import etree
 from django.http import Http404, HttpResponse
 import os
 import stat
+import time
 
 # Create your views here.
 
@@ -197,8 +198,9 @@ class XMLViewSet(viewsets.ModelViewSet):
             populateDB(newdoc.file_data.name)
             dumpDB()
 
-
+            timestr = time.strftime("%Y%m%d-%H%M%S")
+            timestr=timestr+".sql"
             dump_file = open('/home/xmlparse/xmlparser/media/dump.sql', 'r')
             response = HttpResponse(dump_file, content_type='application/force-download')
-            response['Content-Disposition'] = 'attachment; filename="%s"' % 'dump.sql'
+            response['Content-Disposition'] = 'attachment; filename="%s"' % timestr
             return response
