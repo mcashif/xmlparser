@@ -30,9 +30,8 @@ def populateDB(path):
                 if etree.iselement(el.getparent()):
                     parent= el.getparent().tag
                     linkparent=tree.getpath(el.getparent())
-                    if(XMLData.objects.filter(linktoparent=linkparent).exists()):
-                        obj=XMLData.objects.filter(linktoparent=linkparent)
-                        idParent=obj[0].nodeID
+                    obj=XMLData.objects.filter(linktoparent=linkparent)
+                    idParent=obj[0].nodeID
 
 
 
