@@ -128,7 +128,7 @@ def dumpDB():
     DB_Name = 'xmlparse$xmlparser'
     backupDir = '/home/xmlparse/xmlparser/media'
 
-    mysqldump_cmd = "mysqldump -u " + db_User_Name + " --password='" + DB_User_Password + "' -h xmlparse.mysql.pythonanywhere-services.com --databases '" + DB_Name + "'" + " xp_xmldata" +" > " + backupDir + "/" + "dump.sql"
+    mysqldump_cmd = "mysqldump -u " + db_User_Name + " --password='" + DB_User_Password + "' -h xmlparse.mysql.pythonanywhere-services.com --databases '" + DB_Name + "'" + "--ignore-table='xp_xmldata'" + " > " + backupDir + "/" + "dump.sql"
     os.system(mysqldump_cmd)
 
 #Helper Function Remove Directory
