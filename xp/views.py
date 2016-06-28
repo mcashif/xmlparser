@@ -198,9 +198,9 @@ class XMLViewSet(viewsets.ModelViewSet):
 
             timestr = time.strftime("%Y%m%d-%H%M%S")
             timestr=timestr+".sql"
-            dump_file = open('/home/xmlparse/xmlparser/media/dump.sql', 'r')
-            #path=settings.PROJECT_ROOT+"/media/dump.sql"
-            #dump_file = open(path, 'r')
+            #dump_file = open('/home/xmlparse/xmlparser/media/dump.sql', 'r')
+            path=settings.PROJECT_ROOT+"/media/dump.sql"
+            dump_file = open(path, 'r')
 
             response = HttpResponse(dump_file, content_type='application/force-download')
             response['Content-Disposition'] = 'attachment; filename="%s"' % timestr
@@ -230,9 +230,9 @@ def index(request):
 
                 timestr = time.strftime("%Y%m%d-%H%M%S")
                 timestr=timestr+".sql"
-                dump_file = open('/home/xmlparse/xmlparser/media/dump.sql', 'r')
-                #path=settings.PROJECT_ROOT+"/media/dump.sql"
-                #dump_file = open(path, 'r')
+                #dump_file = open('/home/xmlparse/xmlparser/media/dump.sql', 'r')
+                path=settings.PROJECT_ROOT+"/media/dump.sql"
+                dump_file = open(path, 'r')
 
                 response = HttpResponse(dump_file, content_type='application/force-download')
                 response['Content-Disposition'] = 'attachment; filename="%s"' % timestr
