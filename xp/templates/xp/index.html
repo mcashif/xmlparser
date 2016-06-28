@@ -1,0 +1,61 @@
+<!DOCTYPE HTML>
+{% load staticfiles %}
+
+<html>
+<head>
+<style>
+#header {
+    background-color:black;
+    color:white;
+    text-align:center;
+    padding:5px;
+}
+#nav {
+    line-height:30px;
+    background-color:#eeeeee;
+    height:300px;
+    width:100px;
+    float:left;
+    padding:5px;
+}
+#section {
+    width:350px;
+    float:left;
+    padding:10px;
+}
+#footer {
+    background-color:black;
+    color:white;
+    clear:both;
+    text-align:center;
+    padding:5px;
+}
+</style>
+</head>
+<body>
+
+<div id="header">
+<h1>XML Parser</h1>
+</div>
+
+<div id="section">
+
+  <form action="{% url "index" %}" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <p>{{ form.non_field_errors }}</p>
+          <p>{{ form.docfile.label_tag }} </p>
+          <p>
+                  {{ form.docfile.errors }}
+                  {{ form.docfile }}
+          </p>
+          <p><input class="button button1" type="submit" value="Load Data" /></p>
+  </form>
+
+</div>
+
+<div id="footer">
+Copyright © 2016
+</div>
+
+</body>
+</html>

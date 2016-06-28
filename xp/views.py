@@ -7,9 +7,13 @@ from rest_framework.parsers import MultiPartParser,FileUploadParser,FormParser
 from rest_framework.response import Response
 from lxml import etree
 from django.http import Http404, HttpResponse
+from django.shortcuts import render_to_response
+from .forms import DocumentForm
+from django.template import RequestContext
 import os
 import stat
 import time
+import shutil
 
 # Create your views here.
 
@@ -161,19 +165,13 @@ def is_regular_dir(path_):
 
 
 def clear_dir(path_):
-    if is_regular_dir(path_):
-        # Given path is a directory, clear its content
-        for name in os.listdir(path_):
-            fullpath = os.path.join(path_, name)
-            if is_regular_dir(fullpath):
-                shutil.rmtree(fullpath, onerror=_remove_readonly)
-            else:
-                force_remove_file_or_symlink(fullpath)
-    else:
-        # Given path is a file or a symlink.
-        # Raise an exception here to avoid accidentally clearing the content
-        # of a symbolic linked directory.
-        raise OSError("Cannot call clear_dir() on a symbolic link")
+    for filename in os.listdir(path_):
+        if filename.endswith(".xml"):
+            filepath = os.path.join(path_, filename)
+            try:
+                shutil.rmtree(filepath)
+            except OSError:
+                os.remove(filepath)
 
 # ViewSets API call to load XML.
 # http -f -a mcashif:abc12345 --timeout=25000 PUT http://127.0.0.1:8000/test/ file_name=kashif docfile@/Users/Apple/Downloads/yy.xml
@@ -201,6 +199,51 @@ class XMLViewSet(viewsets.ModelViewSet):
             timestr = time.strftime("%Y%m%d-%H%M%S")
             timestr=timestr+".sql"
             dump_file = open('/home/xmlparse/xmlparser/media/dump.sql', 'r')
+            #path=settings.PROJECT_ROOT+"/media/dump.sql"
+            #dump_file = open(path, 'r')
+
             response = HttpResponse(dump_file, content_type='application/force-download')
             response['Content-Disposition'] = 'attachment; filename="%s"' % timestr
             return response
+
+
+
+def index(request):
+        # Handle file upload
+        if request.method == 'POST':
+            form = DocumentForm(request.POST, request.FILES)
+            if form.is_valid():
+
+                #CLear All Old Data in Database
+                clear_dir(settings.PROJECT_ROOT+"/media/dbdata/")
+                XMLFile.objects.all().delete()
+                #////////////////////////////////////////////////////
+                #Read Excel and load into Database for processing.....
+
+                newdoc = XMLFile(file_data = request.FILES['docfile'])
+                newdoc.save()
+
+                cleanXMLLevel1(newdoc.file_data.name)
+                cleanXMLLevel2(newdoc.file_data.name)
+                populateDB(newdoc.file_data.name)
+                dumpDB()
+
+                dump_file = open('/home/xmlparse/xmlparser/media/dump.sql', 'r')
+                #path=settings.PROJECT_ROOT+"/media/dump.sql"
+                #dump_file = open(path, 'r')
+
+                response = HttpResponse(dump_file, content_type='application/force-download')
+                response['Content-Disposition'] = 'attachment; filename="%s"' % timestr
+                return response
+        else:
+            form = DocumentForm() # A empty, unbound form
+
+
+        # Render GUI
+        return render_to_response(
+            'xp/index.html',
+            {'form': form},
+            context_instance=RequestContext(request)
+        )
+
+        return HttpResponse(template.render(context, request))

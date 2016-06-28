@@ -27,5 +27,6 @@ router.register(r'xp', XMLViewSet)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^index/', 'xp.views.index', name='index'),
     url(r'^', include(router.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
