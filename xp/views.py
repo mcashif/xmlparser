@@ -228,6 +228,8 @@ def index(request):
                 populateDB(newdoc.file_data.name)
                 dumpDB()
 
+                timestr = time.strftime("%Y%m%d-%H%M%S")
+                timestr=timestr+".sql"
                 dump_file = open('/home/xmlparse/xmlparser/media/dump.sql', 'r')
                 #path=settings.PROJECT_ROOT+"/media/dump.sql"
                 #dump_file = open(path, 'r')
