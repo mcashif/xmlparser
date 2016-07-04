@@ -9,6 +9,7 @@ from lxml import etree
 from django.http import Http404, HttpResponse
 from django.shortcuts import render_to_response
 from .forms import DocumentForm
+import fileinput
 from django.template import RequestContext
 import os
 import stat
@@ -28,16 +29,16 @@ def populateDB(path):
 
 
     XMLData.objects.all().delete()
-    parser = etree.XMLParser(load_dtd= True)
-    tree = etree.parse(settings.PROJECT_ROOT+"/media/"+path,parser)
+    #parser = etree.XMLParser(load_dtd= True)
+    tree = etree.parse(settings.PROJECT_ROOT+"/media/"+path)
     for el in tree.iter():
              if etree.iselement(el):
 
                 if etree.iselement(el.getparent()):
                     parent= el.getparent().tag
                     linkparent=tree.getpath(el.getparent())
-                    obj=XMLData.objects.filter(linktoparent=linkparent)
-                    idParent=obj[0].nodeID
+                    #obj=XMLData.objects.filter(linktoparent=linkparent)
+                    idParent=0
 
 
 
@@ -45,6 +46,7 @@ def populateDB(path):
                 txtData=getTxtData(el)
                 newRecord = XMLData(nodeID=idNode, nodeName = el.tag, nodeparentName = parent, nodeparentID = idParent ,nodeattribute = str(dict(el.attrib)), nodedata =  txtData, linktoparent= link)
                 newRecord.save()
+                #print("Record Added %s is %s  ", idNode, el.tag)
                 idNode=idNode+1
 
 # some utility functions:
@@ -87,10 +89,35 @@ def getRealNext(node):
 
 
 #clean XML file from self closing tags and put non-tail data under tags.
+def cleanXMLLevel0(path):
+
+    filename=settings.PROJECT_ROOT+"/media/"+path
+    old_string='&'
+    new_string='dtd_reference(ignored'
+
+    # Safely read the input filename using 'with'
+    with open(filename) as f:
+        s = f.read()
+
+        #if file have no DTD reference then return
+        if '.dtd' not in s:
+            return
+        #of if file has no reference then return
+        if old_string not in s:
+            return
+
+    # Safely write the changed content, if found in the file
+    with open(filename, 'w') as f:
+        print("Clean DTD File, Some Reference Data will lost")
+        s = s.replace(old_string, new_string)
+        f.write(s)
+
+
+
+#clean XML file from self closing tags and put non-tail data under tags.
 def cleanXMLLevel2(path):
 
-    parser = etree.XMLParser(load_dtd= True)
-    tree = etree.parse(settings.PROJECT_ROOT+"/media/"+path,parser)
+    tree = etree.parse(settings.PROJECT_ROOT+"/media/"+path)
 
 
     for el in tree.iter():
@@ -113,8 +140,7 @@ def cleanXMLLevel2(path):
 #it has been found XML file has some useless : element and those are needed to be deleted
 def cleanXMLLevel1(path):
 
-    parser = etree.XMLParser(load_dtd= True)
-    tree = etree.parse(settings.PROJECT_ROOT+"/media/"+path,parser)
+    tree = etree.parse(settings.PROJECT_ROOT+"/media/"+path)
 
 
     for el in tree.iter():
@@ -191,8 +217,13 @@ class XMLViewSet(viewsets.ModelViewSet):
             newdoc = XMLFile(file_data = data)
             newdoc.save()
 
+            cleanXMLLevel0(newdoc.file_data.name)
+            print("Clean Level-0 Done")
+
             cleanXMLLevel1(newdoc.file_data.name)
+            print("Clean Level-1 Done")
             cleanXMLLevel2(newdoc.file_data.name)
+            print("Clean Level-2 Done")
             populateDB(newdoc.file_data.name)
             dumpDB()
 
@@ -219,12 +250,17 @@ def index(request):
                 XMLFile.objects.all().delete()
                 #////////////////////////////////////////////////////
                 #Read Excel and load into Database for processing.....
-
                 newdoc = XMLFile(file_data = request.FILES['docfile'])
                 newdoc.save()
 
+                cleanXMLLevel0(newdoc.file_data.name)
+                print("Clean Level-0 Done")
+
                 cleanXMLLevel1(newdoc.file_data.name)
+                print("Clean Level-1 Done")
                 cleanXMLLevel2(newdoc.file_data.name)
+                print("Clean Level-2 Done")
+
                 populateDB(newdoc.file_data.name)
                 dumpDB()
 
